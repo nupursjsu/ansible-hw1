@@ -1,0 +1,41 @@
+---
+
+- name: Deploy Playbook
+  hosts: all
+  tasks:
+
+    - name: Installing flask and related dependencies
+      become: yes
+      pip:
+        name: 
+          - argparse 
+          - cheetah 
+          - oauth 
+          - PrettyTable 
+          - pyserial 
+          - flask
+      environment: 
+        PATH: /usr/local/bin:{{ ansible_env.PATH }}
+    
+
+    - name: Create content directory on host
+      become: yes
+      file:
+        path: /opt/esp
+        state: directory
+        mode: '0644'
+
+
+    - name: Copy app server content
+      become: yes
+      copy:
+        src: /Users/rahuly/pythonWork/static
+        dest: /opt/esp
+
+
+        
+    - name: Start webserver after changing directory
+      become: yes
+      shell: nohup python static.py </dev/null >server.log 2>&1 &
+      args:
+        chdir: /opt/esp/static
